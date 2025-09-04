@@ -13,7 +13,7 @@ const Container: FC = () => {
         </p>
 
         <div className="code-box">
-          <span> $ dataforge</span> --schema schema.json --count 10
+          <span> $ dataforge</span> schema.json data
         </div>
 
         <div className="buttons">
