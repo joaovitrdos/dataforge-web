@@ -53,35 +53,36 @@ const Started: React.FC = () => {
   }, {});
 
   const handleSubmit = async () => {
-    setLoading(true);
-    setError(null);
-    setData(null);
+  setLoading(true);
+  setError(null);
+  setData(null);
 
-    try {
-      const requestBody = {
-        schema: { user: schemaGerado }, // 🔹 importante: camada "user"
-        count: count
-      };
+  try {
+    const requestBody = {
+      schema: { user: schemaGerado }, // camada "user"
+      count: count
+    };
 
-      const response = await fetch('https://dataforge-api-production.up.railway.app/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      });
+    const response = await fetch('https://dataforgeapi.up.railway.app/api/dataforge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody)
+    });
 
-      if (!response.ok) {
-        throw new Error(`Erro na requisição da API: ${response.status} ${response.statusText}`);
-      }
-
-      const responseData: DataForgeResponse = await response.json();
-      setData(responseData);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Erro desconhecido');
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      throw new Error(`Erro na requisição da API: ${response.status} ${response.statusText}`);
     }
-  };
+
+    const responseData: DataForgeResponse = await response.json();
+    setData(responseData);
+  } catch (err: any) {
+    console.error(err);
+    setError(err.message || 'Erro desconhecido');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="started-container">
