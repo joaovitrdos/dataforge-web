@@ -1,0 +1,66 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0); /* totalmente transparente */
+  z-index: 1000;
+  margin-top: 0;
+  backdrop-filter: blur(5px); /* opcional: cria efeito de vidro fosco */
+  -webkit-backdrop-filter: blur(10px); /* suporte para Safari */
+  transition: background-color 0.5s ease;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  display: flex;
+  align-items: center;
+}
+
+/* Logo - deixa a imagem do logo com altura fixa */
+.img-logo {
+  margin-right: -60px;
+  height: 150px;
+  width: auto;
+}
+
+/* Links */
+.nav-links li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 18px;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+/* Efeito brilhoso no hover dos links */
+@keyframes shine {
+  0%, 100% {
+    text-shadow:
+      0 0 5px #ffff,
+      0 0 10px #ffff;
+  }
+  50% {
+    text-shadow:
+      0 0 10px #ffff,
+      0 0 20px #ffff,
+      0 0 30px #ffff;
+  }
+}
+
+.nav-links li a:hover {
+  color: #ffffffff;
+  animation: shine 1.5s infinite alternate;
+}

@@ -1,0 +1,29 @@
+.about-container {
+  width: 100%;
+  margin-top: 70px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1f1f1f;
+  line-height: 1.6;
+}
+
+.about-section {
+  margin-bottom: 3rem;
+}
+
+.about-section h1 {
+  
+  font-size: 22px;
+  color: #0a66c2;
+  margin-bottom: 1rem;
+}
+
+.about-section p {
+  font-size: 16px;
+  margin-bottom: 1rem;
+}
+
+.about-section code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}

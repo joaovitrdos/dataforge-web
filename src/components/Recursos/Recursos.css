@@ -1,0 +1,60 @@
+.recursos-container {
+  position: relative;
+  width: 100%;
+  background-image: url('./../../assets/3.png'); /* caminho relativo à pasta public */
+  background-size: cover; /* cobre todo o container */
+  background-position: center; /* centraliza a imagem */
+  display: flex;
+  justify-content: space-between;
+  gap: 15rem;
+  padding: 3rem 2rem;
+  flex-wrap: wrap;
+}
+
+.recursos-lista {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.recurso-item {
+  background-color: #111;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.recurso-item:hover {
+  box-shadow: 0 0 10px #fff;
+}
+
+.recurso-item .icone {
+  font-size: 18px;
+}
+
+.recurso-item .titulo {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.recurso-item .descricao {
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.4;
+}
+
+.codigo-json {
+  flex: 1;
+  min-width: 300px;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 0.95rem;
+  color: #eee;
+  overflow-x: auto;
+}
