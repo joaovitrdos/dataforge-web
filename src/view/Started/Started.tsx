@@ -68,7 +68,7 @@ const Started: React.FC = () => {
         count: count
       };
 
-      const response = await fetch('http://localhost:8080/api/dataforge', {
+      const response = await fetch('https://dataforgeapi.up.railway.app/api/dataforge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
