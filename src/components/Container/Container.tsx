@@ -9,7 +9,7 @@ const Container: FC = () => {
         <h1>Geração de Dados de Teste Autênticos para o Desenvolvimento.</h1>
         <p>
            Chega de dados de teste manuais e demorados. A DataForge API gera dados de teste realistas e fictícios para o seu desenvolvimento.
-            Tudo com um simples JSON, para você focar no que realmente importa: o seu código.
+            Tudo com um simples JSON e SQL, para você focar no que realmente importa: o seu código.
         </p>
 
         <div className="code-box">

@@ -1,10 +1,12 @@
+// Started.tsx
+
 import React, { useState } from 'react';
 import './Started.css';
 import { FaTrash } from 'react-icons/fa';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import CopyButton from './../../components/CopyButton/CopyButton.tsx'; // ajuste o caminho conforme necessário
-
+import CopyButton from './../../components/CopyButton/CopyButton.tsx';
+import Modal from './../../components/Modal/Modal.tsx';
 
 interface Campo {
   chave: string;
@@ -34,6 +36,9 @@ const Started: React.FC = () => {
   const [data, setData] = useState<DataForgeResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [sqlGerado, setSqlGerado] = useState("");
+  const [previewType, setPreviewType] = useState<'json' | 'sql'>('json');
 
   const handleAdicionarCampo = () => {
     if (novoCampo && novoTipo) {
@@ -53,36 +58,50 @@ const Started: React.FC = () => {
   }, {});
 
   const handleSubmit = async () => {
-  setLoading(true);
-  setError(null);
-  setData(null);
+    setLoading(true);
+    setError(null);
+    setData(null);
 
-  try {
-    const requestBody = {
-      schema: { user: schemaGerado }, // camada "user"
-      count: count
-    };
+    try {
+      const requestBody = {
+        schema: { user: schemaGerado },
+        count: count
+      };
 
-    const response = await fetch('https://dataforgeapi.up.railway.app/api/dataforge', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
-    });
+      const response = await fetch('http://localhost:8080/api/dataforge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
 
-    if (!response.ok) {
-      throw new Error(`Erro na requisição da API: ${response.status} ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Erro na requisição da API: ${response.status} ${response.statusText}`);
+      }
+
+      const responseData: DataForgeResponse = await response.json();
+      setData(responseData);
+
+      // Gera SQL automaticamente ao gerar dados
+      if (responseData.data.length > 0) {
+        const tabela = "usuarios";
+        const cols = Object.keys(responseData.data[0]).join(", ");
+        const vals = responseData.data.map(item => {
+          return "(" + Object.values(item)
+            .map(val => (typeof val === "string" ? `'${val.replace(/'/g, "''")}'` : val))
+            .join(", ") + ")";
+        }).join(",\n  ");
+
+        const sql = `INSERT INTO ${tabela} (${cols}) VALUES\n  ${vals};`;
+        setSqlGerado(sql);
+      }
+
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Erro desconhecido');
+    } finally {
+      setLoading(false);
     }
-
-    const responseData: DataForgeResponse = await response.json();
-    setData(responseData);
-  } catch (err: any) {
-    console.error(err);
-    setError(err.message || 'Erro desconhecido');
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   return (
     <div className="started-container">
@@ -93,7 +112,7 @@ const Started: React.FC = () => {
         <div className="grupo-input">
           <input
             type="text"
-            placeholder="Nome do Campo "
+            placeholder="Nome do Campo"
             value={novoCampo}
             onChange={(e) => setNovoCampo(e.target.value)}
           />
@@ -110,15 +129,12 @@ const Started: React.FC = () => {
         </div>
 
         <div className="lista-campos">
-          <label htmlFor="count">Campos:</label>
+          <label>Campos:</label>
           {campos.map((campo, index) => (
             <div key={index} className="item-campo">
               <span className="chave-campo">{campo.chave}</span>
               <span className="valor-campo">{campo.valor}</span>
-              <button
-                onClick={() => handleRemoverCampo(index)}
-                title="Remover campo"
-              >
+              <button onClick={() => handleRemoverCampo(index)} title="Remover campo">
                 <FaTrash />
               </button>
             </div>
@@ -135,39 +151,62 @@ const Started: React.FC = () => {
             min={1}
             max={100}
           />
-          <button
-            onClick={handleSubmit}
-            disabled={loading || campos.length === 0}
-          >
+          <button onClick={handleSubmit} disabled={loading || campos.length === 0}>
             {loading ? 'Gerando...' : 'Gerar Dados'}
           </button>
         </div>
       </div>
 
-      <h3>Preview do Schema JSON</h3>
+      <div className="preview-toggle">
+        <button
+          className={previewType === 'json' ? 'active' : ''}
+          onClick={() => setPreviewType('json')}
+        >
+          JSON
+        </button>
+        <button
+          className={previewType === 'sql' ? 'active' : ''}
+          onClick={() => setPreviewType('sql')}
+          disabled={!sqlGerado}
+        >
+          SQL
+        </button>
+      </div>
+
       <div className="visualizacao-schema">
-         <CopyButton textToCopy={JSON.stringify(schemaGerado, null, 2)} />
-  <SyntaxHighlighter language="json" style={nord} showLineNumbers={true}>
-    {JSON.stringify(schemaGerado, null, 2)}
-  </SyntaxHighlighter>
-</div>
+        {previewType === 'json' && (
+          <>
+            <CopyButton textToCopy={JSON.stringify(data || schemaGerado, null, 2)} />
+            <SyntaxHighlighter language="json" style={nord} showLineNumbers>
+              {JSON.stringify(data || schemaGerado, null, 2)}
+            </SyntaxHighlighter>
+          </>
+        )}
+
+        {previewType === 'sql' && (
+          <>
+            <CopyButton textToCopy={sqlGerado} />
+            <SyntaxHighlighter language="sql" style={nord} showLineNumbers>
+              {sqlGerado || '-- Nenhum SQL gerado ainda.'}
+            </SyntaxHighlighter>
+          </>
+        )}
+      </div>
 
       {error && <div className="error-message">Erro: {error}</div>}
 
-      {data && (
-        <div>
-          <h3>Dados Gerados</h3>
-          <div className="dados-gerados">
-             <CopyButton textToCopy={JSON.stringify(schemaGerado, null, 2)} />
-            <SyntaxHighlighter language="json" style={nord} showLineNumbers={true}>
-      {JSON.stringify(data, null, 2)}
-    </SyntaxHighlighter>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Comandos SQL Gerados">
+        <div style={{ position: 'relative', padding: '1.2rem', width: '100%'}}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+            <CopyButton textToCopy={sqlGerado} />
           </div>
+          <SyntaxHighlighter language="sql" style={nord} showLineNumbers >
+            {sqlGerado}
+          </SyntaxHighlighter>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };
 
 export default Started;
-

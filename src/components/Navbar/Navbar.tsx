@@ -14,10 +14,10 @@ const Navbar: FC = () => {
           <Link to="/">Home</Link>
         </li>
         <li>
-          <Link to="/docs">Docs</Link>
+          <Link to="/docs"></Link>
         </li>
         <li>
-          <Link to="/about">About</Link>
+          <Link to="/about"></Link>
         </li>
       </ul>
     </nav>
