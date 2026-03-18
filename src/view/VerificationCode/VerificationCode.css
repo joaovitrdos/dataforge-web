@@ -250,21 +250,3 @@
   .auth-card { padding: 28px 20px; }
   .auth-code-input { width: 44px; height: 50px; font-size: 18px; }
 }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #0f0f10;
-  color: white;
-  overflow-x: hidden;
-}
-
-#root {
-  display: flex;
-  flex-direction: column;
-}

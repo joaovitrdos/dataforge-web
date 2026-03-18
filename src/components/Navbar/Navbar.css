@@ -1,66 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap');
+
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 90px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0); /* totalmente transparente */
+  height: 64px;
   z-index: 1000;
-  margin-top: 0;
-  backdrop-filter: blur(5px); /* opcional: cria efeito de vidro fosco */
-  -webkit-backdrop-filter: blur(10px); /* suporte para Safari */
-  transition: background-color 0.5s ease;
+  transition: background 0.3s, border-color 0.3s;
+  border-bottom: 1px solid transparent;
 }
 
-.nav-links {
+.navbar-scrolled {
+  background: rgba(15, 15, 16, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom-color: #2a2a30;
+}
+
+.navbar-inner {
+  max-width: 100%;
+  height: 100%;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ─── Left ──────────────────────────────────────────── */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.navbar-logo-link {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.navbar-logo {
+  height: 48px;
+  width: auto;
+}
+
+.navbar-links {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 4px;
   margin: 0;
   padding: 0;
 }
 
-.nav-links li {
+.navbar-links li a {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b6b72;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.navbar-links li a:hover {
+  color: #e8e8e0;
+  background: #18181b;
+}
+
+/* ─── Right ─────────────────────────────────────────── */
+.navbar-right {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
-/* Logo - deixa a imagem do logo com altura fixa */
-.img-logo {
-  margin-right: -60px;
-  height: 150px;
-  width: auto;
-}
-
-/* Links */
-.nav-links li a {
-  color: white;
+.navbar-btn-outline {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8e8e0;
   text-decoration: none;
+  padding: 7px 16px;
+  border: 1px solid #2a2a30;
+  border-radius: 8px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.navbar-btn-outline:hover {
+  border-color: #7c6af7;
+  background: #18181b;
+}
+
+.navbar-btn-primary {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  padding: 7px 16px;
+  background: #7c6af7;
+  border: 1px solid #7c6af7;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.navbar-btn-primary:hover { background: #9483ff; }
+
+/* ─── Profile + Dropdown ────────────────────────────── */
+.navbar-profile {
+  position: relative;
+}
+
+.navbar-avatar {
+  width: 36px;
+  height: 36px;
+  background: #7c6af7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  user-select: none;
+}
+
+.navbar-avatar:hover { opacity: 0.85; }
+
+.navbar-dropdown {
+  top: 100%; /* ← sem gap */
+  padding-top: 10px; /* ← espaço visual vira parte do próprio elemento */
+  background: transparent; /* ← reseta aqui... */
+}
+
+/* ...e aplica o fundo no conteúdo interno */
+.navbar-dropdown-inner {
+  background: #18181b;
+  border: 1px solid #2a2a30;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.navbar-dropdown {
+  position: absolute;
+  top: calc(100% + 10px); /* ← esse +10px é o culpado */
+  right: 0;
+  min-width: 200px;
+  background: #18181b;
+  border: 1px solid #2a2a30;
+  border-radius: 12px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+/* Preenche o gap invisível com padding */
+.navbar-profile::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 12px; /* cobre o espaço entre avatar e dropdown */
+}
+
+.navbar-profile:hover .navbar-dropdown,
+.navbar-profile:focus-within .navbar-dropdown {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
+.navbar-dropdown-user {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar-dropdown-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8e8e0;
+}
+
+.navbar-dropdown-email {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #5a5a64;
+}
+
+.navbar-dropdown-divider {
+  height: 1px;
+  background: #2a2a30;
+}
+
+.navbar-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 11px 16px;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
   font-weight: 500;
-  font-size: 18px;
-  transition: color 0.3s, text-shadow 0.3s;
+  color: #6b6b72;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
 
-/* Efeito brilhoso no hover dos links */
-@keyframes shine {
-  0%, 100% {
-    text-shadow:
-      0 0 5px #ffff,
-      0 0 10px #ffff;
-  }
-  50% {
-    text-shadow:
-      0 0 10px #ffff,
-      0 0 20px #ffff,
-      0 0 30px #ffff;
-  }
+.navbar-dropdown-item:hover {
+  background: #1f1f24;
+  color: #e8e8e0;
 }
 
-.nav-links li a:hover {
-  color: #ffffffff;
-  animation: shine 1.5s infinite alternate;
+.navbar-dropdown-logout { color: #ff7070; }
+.navbar-dropdown-logout:hover { background: #2a1010; color: #ff7070; }
+
+/* ─── Spacer — add to pages to prevent content hiding under navbar ── */
+.navbar-spacer {
+  height: 64px;
+  flex-shrink: 0;
 }

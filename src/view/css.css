@@ -251,20 +251,73 @@
   .auth-code-input { width: 44px; height: 50px; font-size: 18px; }
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.auth-divider {
+  height: 1px;
+  background: #2a2a30;
+  margin: 20px 0;
 }
 
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #0f0f10;
-  color: white;
-  overflow-x: hidden;
-}
-
-#root {
+/* ─── Steps indicator ───────────────────────────────── */
+.auth-steps {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.auth-step {
+  width: 28px;
+  height: 4px;
+  border-radius: 2px;
+  background: #2a2a30;
+  transition: background 0.3s;
+}
+
+.auth-step.active { background: #7c6af7; }
+.auth-step.done { background: #4dd98a; }
+
+/* ─── Responsive ────────────────────────────────────── */
+@media (max-width: 480px) {
+  .auth-card { padding: 28px 20px; }
+  .auth-code-input { width: 44px; height: 50px; font-size: 18px; }
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+  color: #3e3e48;
+  font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #2a2a30;
+}
+
+.auth-btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px;
+  background: transparent;
+  border: 1px solid #2a2a30;
+  border-radius: 10px;
+  color: #e8e8e0;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Syne', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.auth-btn-google:hover {
+  border-color: #7c6af7;
+  background: #18181b;
 }

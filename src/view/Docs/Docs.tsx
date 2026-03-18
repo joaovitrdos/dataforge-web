@@ -1,186 +1,232 @@
 import React from 'react';
-import './Docs.css';
+import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { nord } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import Footer from '../../components/Footer/Footer';
+import './Docs.css';
 
-// Não há props para tipar, então usamos uma interface vazia.
-// Isso é uma boa prática para manter o código limpo e escalável.
-interface DocsProps { }
+const curlCode = `curl -X POST http://localhost:8080/api/json/generate-ai \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "tableName": "usuarios",
+    "fields": [
+      { "name": "nome",  "type": "nome_completo" },
+      { "name": "email", "type": "email" }
+    ],
+    "count": 2
+  }'`;
 
-// Usamos React.FC (Functional Component) com a interface que definimos.
-const Docs: React.FC<DocsProps> = () => {
-
-  // Bloco de código para o exemplo do CURL
-  const curlCode = `curl -X POST http://localhost:8080/generate-data \\
-  "Content-Type: application/json" \\
-  '{
-    "count": 1,
-    "schema": {
-        "full_name": "full_name",
-        "email_address": "email_address"
-    }
-}'`;
-
-  // Bloco de código para o exemplo do JSON
-  const jsonCode = `{
-  "count": 2,
-  "schema": {
-    "id": "uuid",
-    "nome_completo": "full_name",
-    "idade": "integer:18-60",
-    "data_criacao": "date_past"
-  }
+const jsonRequest = `{
+  "tableName": "usuarios",
+  "fields": [
+    { "name": "id",           "type": "uuid" },
+    { "name": "nome",         "type": "nome_completo" },
+    { "name": "idade",        "type": "inteiro:18-60" },
+    { "name": "criado_em",    "type": "data_passada" }
+  ],
+  "count": 2
 }`;
 
+const jsonResponse = `{
+  "tableName": "usuarios",
+  "data": [
+    { "id": "a1b2c3...", "nome": "João Santos", "idade": 34, "criado_em": "2023-04-12" },
+    { "id": "d4e5f6...", "nome": "Maria Silva", "idade": 27, "criado_em": "2022-11-08" }
+  ],
+  "sql": "INSERT INTO usuarios (id, nome, idade, criado_em) VALUES\\n  ('a1b2c3...', 'João Santos', 34, '2023-04-12'),\\n  ('d4e5f6...', 'Maria Silva', 27, '2022-11-08');"
+}`;
+
+const tiposData = [
+  { categoria: 'Pessoal', tipos: 'nome_completo, email, telefone, cpf, cnpj, data_nascimento', exemplo: '"nome": "nome_completo"' },
+  { categoria: 'Profissional', tipos: 'cargo, empresa, universidade, ocupacao', exemplo: '"cargo": "cargo"' },
+  { categoria: 'Localização', tipos: 'endereco, cidade, estado, cep, latitude, longitude, pais, estado_sigla', exemplo: '"cidade": "cidade"' },
+  { categoria: 'Financeiro', tipos: 'valor_monetario, preco, cartao_credito, moeda', exemplo: '"preco": "preco"' },
+  { categoria: 'Data / Hora', tipos: 'data_passada, data_futura, timestamp, mes, ano, dia_da_semana', exemplo: '"criado_em": "data_passada"' },
+  { categoria: 'Técnico', tipos: 'uuid, booleano, url, dominio, ip, http_status', exemplo: '"id": "uuid"' },
+  { categoria: 'Customizado', tipos: 'inteiro:min-max, enum:val1,val2, texto:min-max', exemplo: '"idade": "inteiro:18-60"' },
+];
+
+const statusData = [
+  { code: '200 OK', desc: 'Requisição processada com sucesso. Retorna JSON + SQL.' },
+  { code: '400 Bad Request', desc: 'Corpo da requisição inválido ou campo obrigatório ausente.' },
+  { code: '500 Internal Server Error', desc: 'Erro interno — geralmente falha na geração pela IA.' },
+];
+
+const Docs: React.FC = () => {
   return (
-    <div>
-    <div className="docs-container">
-      <header className="docs-header">
-        <h1>DataForge API: Geração de Dados de Teste para Desenvolvedores</h1>
-        <p>A DataForge API é uma ferramenta poderosa para gerar dados de teste realistas e fictícios. Com uma simples requisição HTTP, você obtém dados estruturados e autênticos em segundos.</p>
-        <p className="docs-value-prop">Passe menos tempo criando dados e mais tempo desenvolvendo sua aplicação.</p>
-      </header>
+    <div className="docs-page">
 
-      <section className="docs-section">
-        <h2>1. Começando</h2>
-        <p>Para começar a usar a DataForge, você só precisa fazer uma requisição HTTP para o endpoint principal. Você pode usar qualquer cliente HTTP ou biblioteca de sua preferência.</p>
-        <h3>Exemplo Rápido com `CURL`</h3>
-        <SyntaxHighlighter language="shell" style={nord} showLineNumbers={true}>
-          {curlCode}
-        </SyntaxHighlighter>
+      {/* ── Hero ─────────────────────────────────────── */}
+      <section className="docs-hero">
+        <div className="docs-hero-badge">
+          <span className="docs-hero-dot" />
+          Documentação
+        </div>
+        <h1>DataForge <span className="docs-highlight">API</span></h1>
+        <p>Referência completa para gerar dados de teste brasileiros com JSON e SQL em uma única requisição.</p>
       </section>
 
-      <section className="docs-section">
-        <h2>2. Endpoints</h2>
-        <h3>POST /generate-data</h3>
-        <p>Este endpoint é o principal e único da API. Ele aceita um schema JSON e um número para gerar uma lista de dados.</p>
-        <ul>
-          <li><strong>URL:</strong> <code>http://localhost:8080/generate-data</code></li>
-          <li><strong>Método:</strong> <code>POST</code></li>
-          <li><strong>Headers:</strong> <code>Content-Type: application/json</code></li>
-        </ul>
+      <div className="docs-body">
 
-        <h4>Corpo da Requisição (Request Body)</h4>
-        <p>O corpo da requisição deve ser um objeto JSON contendo o <code>schema</code> e a <code>count</code>.</p>
-        <table>
-          <thead>
-            <tr>
-              <th>Propriedade</th>
-              <th>Tipo</th>
-              <th>Obrigatório</th>
-              <th>Descrição</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>schema</code></td>
-              <td><code>JSON Object</code></td>
-              <td>Sim</td>
-              <td>Um objeto onde a chave é o nome do campo e o valor é o tipo de dado.</td>
-            </tr>
-            <tr>
-              <td><code>count</code></td>
-              <td><code>int</code></td>
-              <td>Não</td>
-              <td>O número de objetos a serem gerados. O padrão é <code>1</code>.</td>
-            </tr>
-          </tbody>
-        </table>
+        {/* ── Começando ────────────────────────────────── */}
+        <section className="docs-section">
+          <div className="docs-section-label">01 — Começando</div>
+          <h2>Exemplo rápido com cURL</h2>
+          <p>Faça uma requisição POST para o endpoint principal com o schema desejado.</p>
+          <SyntaxHighlighter language="shell" style={nord} showLineNumbers customStyle={{ borderRadius: '12px', fontSize: '13px', margin: '16px 0' }}>
+            {curlCode}
+          </SyntaxHighlighter>
+        </section>
 
-        <h4>Exemplo de Corpo da Requisição:</h4>
-        <SyntaxHighlighter language="json" style={nord} showLineNumbers={true}>
-          {jsonCode}
-        </SyntaxHighlighter>
-      </section>
+        {/* ── Endpoint ─────────────────────────────────── */}
+        <section className="docs-section">
+          <div className="docs-section-label">02 — Endpoint</div>
+          <h2>POST /api/json/generate-ai</h2>
+          <p>Único endpoint da API. Recebe o schema e retorna dados fictícios em JSON e SQL.</p>
 
-      <section className="docs-section">
-        <h2>3. Tipos de Dados Suportados</h2>
-        <p>A DataForge suporta uma vasta gama de tipos de dados. Abaixo, uma lista completa para você usar em seu <code>schema</code>.</p>
-        <table>
-          <thead>
-            <tr>
-              <th>Categoria</th>
-              <th>Tipo de Schema</th>
-              <th>Descrição</th>
-              <th>Exemplo de Uso</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Identificação</strong></td>
-              <td><code>full_name</code>, <code>email_address</code>, <code>phone_number</code>, <code>cpf</code>, <code>cnpj</code></td>
-              <td>Nome completo, e-mail, telefone, CPF e CNPJ.</td>
-              <td><code>"nome": "full_name"</code></td>
-            </tr>
-            <tr>
-              <td><strong>Numéricos</strong></td>
-              <td><code>integer:min-max</code>, <code>money_value</code></td>
-              <td>Números inteiros em um intervalo, valores monetários.</td>
-              <td><code>"idade": "integer:20-50"</code></td>
-            </tr>
-            <tr>
-              <td><strong>Endereço</strong></td>
-              <td><code>address</code>, <code>city</code>, <code>state</code>, <code>zip_code</code>, <code>latitude</code>, <code>longitude</code></td>
-              <td>Endereço, cidade, estado, CEP, coordenadas geográficas.</td>
-              <td><code>"cidade": "city"</code></td>
-            </tr>
-            <tr>
-              <td><strong>Tempo</strong></td>
-              <td><code>date_past</code>, <code>date_future</code>, <code>timestamp</code></td>
-              <td>Data no passado ou no futuro, timestamp Unix.</td>
-              <td><code>"aniversario": "date_past"</code></td>
-            </tr>
-            <tr>
-              <td><strong>Internet</strong></td>
-              <td><code>url</code>, <code>domain_name</code>, <code>ip_address</code></td>
-              <td>URLs, nomes de domínio, endereços IP públicos.</td>
-              <td><code>"website": "url"</code></td>
-            </tr>
-            <tr>
-              <td><strong>Conteúdo</strong></td>
-              <td><code>sentence</code>, <code>paragraph</code></td>
-              <td>Uma frase aleatória, um parágrafo de texto.</td>
-              <td><code>"resumo": "paragraph"</code></td>
-            </tr>
-            <tr>
-              <td><strong>Diversos</strong></td>
-              <td><code>uuid</code>, <code>boolean</code>, <code>enum:val1,val2</code></td>
-              <td>Identificador único, valor booleano, seleciona um valor de uma lista.</td>
-              <td><code>"id": "uuid"</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+          <div className="docs-endpoint-info">
+            <div className="docs-endpoint-row">
+              <span className="docs-endpoint-key">URL</span>
+              <code className="docs-code">http://localhost:8080/api/json/generate-ai</code>
+            </div>
+            <div className="docs-endpoint-row">
+              <span className="docs-endpoint-key">Método</span>
+              <code className="docs-code docs-code-purple">POST</code>
+            </div>
+            <div className="docs-endpoint-row">
+              <span className="docs-endpoint-key">Header</span>
+              <code className="docs-code">Content-Type: application/json</code>
+            </div>
+          </div>
 
-      <section className="docs-section">
-        <h2>4. Códigos de Status HTTP</h2>
-        <p>Os códigos de status indicam o resultado da sua requisição.</p>
-        <table>
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Descrição</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>200 OK</code></td>
-              <td>A requisição foi processada com sucesso.</td>
-            </tr>
-            <tr>
-              <td><code>400 Bad Request</code></td>
-              <td>A requisição contém um erro de sintaxe JSON ou um tipo de dado não suportado.</td>
-            </tr>
-            <tr>
-              <td><code>500 Internal Server Error</code></td>
-              <td>Ocorreu um erro no servidor.</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-    </div>
-    <Footer />
+          <h3>Campos do request</h3>
+          <div className="docs-table-wrapper">
+            <table className="docs-table">
+              <thead>
+                <tr>
+                  <th>Campo</th>
+                  <th>Tipo</th>
+                  <th>Obrigatório</th>
+                  <th>Descrição</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code className="docs-code">tableName</code></td>
+                  <td><code className="docs-code-muted">string</code></td>
+                  <td><span className="docs-badge-sim">Sim</span></td>
+                  <td>Nome da tabela usada no INSERT gerado.</td>
+                </tr>
+                <tr>
+                  <td><code className="docs-code">fields</code></td>
+                  <td><code className="docs-code-muted">array</code></td>
+                  <td><span className="docs-badge-sim">Sim</span></td>
+                  <td>Lista de objetos com <code className="docs-code">name</code> e <code className="docs-code">type</code>.</td>
+                </tr>
+                <tr>
+                  <td><code className="docs-code">count</code></td>
+                  <td><code className="docs-code-muted">int</code></td>
+                  <td><span className="docs-badge-nao">Não</span></td>
+                  <td>Quantidade de registros a gerar. Padrão: <code className="docs-code">1</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Exemplo de request / response</h3>
+          <div className="docs-code-grid">
+            <div className="docs-code-block">
+              <div className="docs-code-block-header">
+                <span className="docs-tag">Request</span>
+              </div>
+              <SyntaxHighlighter language="json" style={nord} showLineNumbers customStyle={{ margin: 0, borderRadius: '0 0 12px 12px', fontSize: '13px' }}>
+                {jsonRequest}
+              </SyntaxHighlighter>
+            </div>
+            <div className="docs-code-block">
+              <div className="docs-code-block-header">
+                <span className="docs-tag docs-tag-response">Response</span>
+              </div>
+              <SyntaxHighlighter language="json" style={nord} showLineNumbers customStyle={{ margin: 0, borderRadius: '0 0 12px 12px', fontSize: '13px' }}>
+                {jsonResponse}
+              </SyntaxHighlighter>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Tipos de dados ────────────────────────────── */}
+        <section className="docs-section">
+          <div className="docs-section-label">03 — Tipos de dados</div>
+          <h2>Tipos suportados</h2>
+          <p>Use qualquer um dos tipos abaixo no campo <code className="docs-code">type</code> dos seus fields.</p>
+          <div className="docs-table-wrapper">
+            <table className="docs-table">
+              <thead>
+                <tr>
+                  <th>Categoria</th>
+                  <th>Tipos disponíveis</th>
+                  <th>Exemplo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tiposData.map((row, i) => (
+                  <tr key={i}>
+                    <td><span className="docs-categoria">{row.categoria}</span></td>
+                    <td><code className="docs-code-muted">{row.tipos}</code></td>
+                    <td><code className="docs-code">{row.exemplo}</code></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* ── Status HTTP ───────────────────────────────── */}
+        <section className="docs-section">
+          <div className="docs-section-label">04 — Status HTTP</div>
+          <h2>Códigos de resposta</h2>
+          <div className="docs-table-wrapper">
+            <table className="docs-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Descrição</th>
+                </tr>
+              </thead>
+              <tbody>
+                {statusData.map((row, i) => (
+                  <tr key={i}>
+                    <td>
+                      <code className={`docs-code ${row.code.startsWith('200') ? 'docs-code-green' : row.code.startsWith('400') ? 'docs-code-amber' : 'docs-code-red'}`}>
+                        {row.code}
+                      </code>
+                    </td>
+                    <td>{row.desc}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+
+      {/* ── Footer ───────────────────────────────────── */}
+      <footer className="footer">
+        <div className="footer-left">
+          <span className="footer-logo">✦DF</span>
+          <span className="footer-copy">© Data Forge, Inc. 2025</span>
+        </div>
+        <div className="footer-right">
+          <a href="https://www.notion.so/SUPPORT-2637b168d75a80a0bedbf1734532313c" target="_blank" rel="noopener noreferrer">Support</a>
+          <a href="https://www.notion.so/PRIVACY-24c7b168d75a8008a130eed80a10502b" target="_blank" rel="noopener noreferrer">Privacy</a>
+          <a href="https://github.com/joaovitrdos/dataforge-api" target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faGithub} size="lg" />
+          </a>
+        </div>
+      </footer>
+
     </div>
   );
 };
